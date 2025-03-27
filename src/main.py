@@ -1,6 +1,7 @@
 from textnode import TextNode
 from textnode import TextType
 from htmlnode import HTMLNode, LeafNode
+from blocks import *
 import re
 
 
@@ -40,7 +41,6 @@ def split_nodes_image(old_nodes):
         for image in images:
             text_list = re.split(r"!\[.*?\]\(.*?\)", node.text)
         text_list = list(filter(None, text_list))
-        print(text_list)
         for i in range(len(text_list) + len(images)):
             if i % 2 == 0:
                 node_list.append(TextNode(text_list[int(i / 2)], TextType.TEXT))
@@ -123,9 +123,93 @@ def text_to_textnodes(text):
     return nodes
 
 
+def markdown_to_html_node(markdown):
+
+    BlockList = markdown_to_blocks(markdown)
+    HTML_Div = []
+
+    def text_to_children(text):
+        TextNode_List = text_to_textnodes(text)
+        HTMLNode_List = list(map(text_node_to_html_node, TextNode_List))
+        return HTMLNode_List
+
+    def regex_md_line(regex):
+        def curry_line(line):
+            return re.sub(regex, "", line)
+
+        return curry_line
+
+    def regex_md_block(block, regex):
+        line_list = block.split("\n")
+        line_list = list(map(regex_md_line(regex), line_list))
+        block = "\n".join(line_list)
+        return block
+
+    def block_to_paragraph(block):
+        block = re.sub("\n", " ", block)
+        HTMLNode_List = text_to_children(block)
+        return ParentNode("p", HTMLNode_List, None)
+
+    def block_to_heading(block):
+        h_num = len(re.findall(r"^#{1,6} ", block)[0]) - 1
+        block = re.sub(r"#{1,6} ", "", block)
+        HTMLNode_List = text_to_children(block)
+        return ParentNode("h" + str(h_num), HTMLNode_List, None)
+
+    def block_to_quote(block):
+        block = regex_md_block(block, r"^> ")
+
+        HTMLNode_List = text_to_children(block)
+        return ParentNode("blockquote", HTMLNode_List, None)
+
+    def block_to_unordlist(block):
+        block = regex_md_block(block, r"^- ")
+
+        lines_list = block.split("\n")
+        lines_html = list(map(text_to_children, lines_list))
+        HTMLNode_List = []
+        for node_list in lines_html:
+            HTMLNode_List.append(ParentNode("li", node_list))
+
+        return ParentNode("ul", HTMLNode_List, None)
+
+    def block_to_ordlist(block):
+        block = regex_md_block(block, r"^\d. ")
+
+        lines_list = block.split("\n")
+        lines_html = list(map(text_to_children, lines_list))
+        HTMLNode_List = []
+        for node_list in lines_html:
+            HTMLNode_List.append(ParentNode("li", node_list))
+
+        return ParentNode("ol", HTMLNode_List, None)
+
+    for block in BlockList:
+        Type = block_to_block_type(block)
+
+        match Type:
+            case BlockType.PARAGRAPH:
+                HTML_Node = block_to_paragraph(block)
+            case BlockType.HEADING:
+                HTML_Node = block_to_heading(block)
+            case BlockType.QUOTE:
+                HTML_Node = block_to_quote(block)
+            case BlockType.UNORDERED_LIST:
+                HTML_Node = block_to_unordlist(block)
+            case BlockType.ORDERED_LIST:
+                HTML_Node = block_to_ordlist(block)
+            case BlockType.CODE:
+                block = block.strip("``` ").lstrip("\n")
+                Block_HTML = LeafNode("code", block, None)
+                HTML_Node = ParentNode("pre", [Block_HTML], None)
+
+        HTML_Div.append(HTML_Node)
+
+    return ParentNode("div", HTML_Div, None)
+
+
 def main():
-    test = TextNode("testing za text", TextType.BOLD, "idk.com")
-    print(test)
+    pass
 
 
 main()

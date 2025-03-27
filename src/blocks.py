@@ -19,6 +19,11 @@ def markdown_to_blocks(markdown):
     def strip_whitespace(string):
         return string.strip()
 
+    def Nonempty_String(string):
+        return string != ""
+
+    block_list = filter(Nonempty_String, block_list)
+
     block_list = list(map(strip_whitespace, block_list))
     return block_list
 
@@ -41,6 +46,7 @@ def block_to_block_type(MDBlock):
     for line in MDLines_List:
         if not (line_startswith(line, "-")):
             UnordListBool = False
+            break
 
     if UnordListBool:
         return BlockType.UNORDERED_LIST
@@ -49,6 +55,7 @@ def block_to_block_type(MDBlock):
     for i in range(len(MDLines_List)):
         if not (line_startswith(MDLines_List[i], str(i + 1) + ".")):
             OrdListBool = False
+            break
 
     if OrdListBool:
         return BlockType.ORDERED_LIST
@@ -57,6 +64,7 @@ def block_to_block_type(MDBlock):
     for line in MDLines_List:
         if not (line_startswith(line, ">")):
             QuoteListBool = False
+            break
 
     if QuoteListBool:
         return BlockType.QUOTE
