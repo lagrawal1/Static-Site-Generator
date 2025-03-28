@@ -1,7 +1,7 @@
 import unittest
 
 from textnode import TextNode, TextType
-from main import *
+from convert import *
 from blocks import markdown_to_blocks
 
 

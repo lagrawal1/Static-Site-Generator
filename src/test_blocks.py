@@ -1,7 +1,7 @@
 import unittest
 
 from blocks import *
-from main import markdown_to_html_node
+from convert import markdown_to_html_node, extract_title
 
 
 class Test_MD_to_BlockType(unittest.TestCase):
@@ -133,3 +133,13 @@ Brought to you by Kirito from the Kirito is Always Right Foundation
             html,
             "<div><ul><li>The power of love is bullsh*t. Swords and violence. That's where the money is.</li><li>There's no need to wonder where your god is. Cause he's right here and he's fresh out of mercy.</li></ul><p>Brought to you by Kirito from the Kirito is Always Right Foundation</p></div>",
         )
+
+
+class Test_Extract_Title(unittest.TestCase):
+    def test_extract_title(self):
+        md = """
+# title is title
+
+"""
+        title = extract_title(md)
+        self.assertEqual("title is title", title)
