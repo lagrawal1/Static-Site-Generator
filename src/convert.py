@@ -167,7 +167,7 @@ def markdown_to_html_node(markdown):
         return ParentNode("h" + str(h_num), HTMLNode_List, None)
 
     def block_to_quote(block):
-        block = regex_md_block(block, r"^> ")
+        block = regex_md_block(block, r"^>").strip()
 
         HTMLNode_List = text_to_children(block)
         return ParentNode("blockquote", HTMLNode_List, None)
