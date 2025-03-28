@@ -36,6 +36,10 @@ def generate_page(from_path, template_path, dest_path):
     return
 
 
+def generate_pages_recursive(dir_path_content, template_path, dest_dir_path):
+    pass
+
+
 def main():
     copy_files("static", "public")
     generate_page("content/index.md", "template.html", "public/index.html")

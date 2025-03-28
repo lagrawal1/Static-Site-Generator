@@ -66,21 +66,14 @@ def split_nodes_link(old_nodes):
             continue
 
         text_list, node_list = [], []
-        for image in links:
-            text_list = re.split(r"(\[.*?\]\(.*?\))", node.text)
+        text_list = re.split(r"(\[.*?\]\(.*?\))", node.text)
+        text_list = list(filter(None, text_list))
 
         for i in range(len(text_list)):
             if len(extract_markdown_links(text_list[i])) == 0:
                 node_list.append(TextNode(text_list[i], TextType.TEXT))
             else:
                 link = extract_markdown_links(text_list[i])
-                print(
-                    TextNode(
-                        link[0][0],
-                        TextType.LINK,
-                        link[0][1],
-                    )
-                )
                 node_list.append(
                     TextNode(
                         link[0][0],
@@ -117,7 +110,7 @@ def extract_markdown_images(text):
 
 
 def extract_markdown_links(text):
-    link_tuples = re.findall(r"[^!]\[(.*?)\]\((.*?)\)", text)
+    link_tuples = re.findall(r"\[(.*?)\]\((.*?)\)", text)
     return link_tuples
 
 
