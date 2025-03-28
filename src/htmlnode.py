@@ -15,7 +15,7 @@ class HTMLNode:
             return html_props
 
         for prop in self.props:
-            html_props += f' {prop} = "{self.props[prop]}"'
+            html_props += f' {prop}="{self.props[prop]}"'
         return html_props
 
     def __repr__(self):
